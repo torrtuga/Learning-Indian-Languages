@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 /**
  * Created by B on 8/27/2016.
@@ -28,7 +27,6 @@ public class NumbersFragment extends Fragment {
         ListAdapter arrayAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,languages);
         ListView listView = (ListView)rootView.findViewById(R.id.list);
         listView.setAdapter(arrayAdapter);
-        Toast.makeText(getActivity(),"Inside Numbers Fragment",Toast.LENGTH_SHORT).show();
 
         return rootView;
     }

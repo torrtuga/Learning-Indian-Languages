@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#212121</color>
     <color name="colorAccent">#ff4081</color>
     <color name="listView_background">#616161</color>
+    <color name="tabLayout_text">#9E9E9E</color>
 </resources>
