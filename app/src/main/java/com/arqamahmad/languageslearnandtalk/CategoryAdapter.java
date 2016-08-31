@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.widget.Toast;
 
 /**
  * Created by B on 8/27/2016.
@@ -20,21 +19,20 @@ public class CategoryAdapter extends FragmentPagerAdapter {
     public CategoryAdapter(Context context,FragmentManager fm){
         super(fm);
         mContext = context;
-        Toast.makeText(mContext,"Inside Custom Adapter",Toast.LENGTH_SHORT).show();
     }
     @Override
     public Fragment getItem(int position) {
         if (position == 0) {
-            return new ChatFragment();
+            return new NumbersFragment();
         } else if (position == 1) {
             return new FamilyFragment();
         } else if (position == 2) {
-            return new ColorsFragment();
+            return new PronounsFragment();
         } else if (position == 3){
             return new PhrasesFragment();
         }
         else {
-            return new NumbersFragment();
+            return new ChatFragment();
         }
     }
 
@@ -50,7 +48,7 @@ public class CategoryAdapter extends FragmentPagerAdapter {
         } else if (position == 1) {
             return mContext.getString(R.string.category_family);
         } else if (position == 2) {
-            return mContext.getString(R.string.category_colors);
+            return mContext.getString(R.string.category_pronouns);
         } else if(position == 3) {
             return mContext.getString(R.string.category_phrases);
         }

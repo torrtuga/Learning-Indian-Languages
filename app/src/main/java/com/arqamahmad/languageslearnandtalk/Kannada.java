@@ -1,14 +1,15 @@
 package com.arqamahmad.languageslearnandtalk;
 
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
 import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 public class Kannada extends AppCompatActivity {
 
 
     private ViewPager viewPager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,4 +25,6 @@ public class Kannada extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
 
     }
+
+
 }

@@ -15,9 +15,9 @@ import java.util.ArrayList;
 /**
  * Created by B on 8/27/2016.
  */
-public class FamilyFragment extends Fragment {
+public class PronounsFragment extends Fragment {
 
-    public FamilyFragment(){
+    public PronounsFragment(){
 
     }
 
@@ -27,9 +27,10 @@ public class FamilyFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_layout,container,false);
 
 
+
         ArrayList<CustomDataStructure> words = new ArrayList<CustomDataStructure>();
 
-        if(MainActivity.familyResponse == ""){
+        if(MainActivity.pronounsResponse == ""){
             Toast.makeText(getActivity(),"Internet Problem",Toast.LENGTH_SHORT).show();
             String[] languages = {"Kannada","Tamil","Telugu","Malayalam","Bengali"}; //String array with language name
             ListAdapter arrayAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,languages);
@@ -38,7 +39,7 @@ public class FamilyFragment extends Fragment {
         }
         else {
             //parsing the response into CustomDataStructure
-            String response = MainActivity.familyResponse;
+            String response = MainActivity.pronounsResponse;
             String[] dataArray = response.split("\\*");
             int i = 0;
             for (i = 0; i < dataArray.length; i++) {
