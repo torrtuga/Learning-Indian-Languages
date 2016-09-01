@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "995636706916",
+    "firebase_url": "https://learn-kannada.firebaseio.com",
+    "project_id": "learn-kannada",
+    "storage_bucket": "learn-kannada.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:995636706916:android:da8b6cb969ef56b6",
+        "android_client_info": {
+          "package_name": "com.arqamahmad.languageslearnandtalk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "995636706916-k5emhj4vaj137n8as4hnfpdalvifri0f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.arqamahmad.languageslearnandtalk",
+            "certificate_hash": "481AFAA4E46693B96092699590F97F6DCB48C842"
+          }
+        },
+        {
+          "client_id": "995636706916-nhf24teeigsg1s73dbht53cptqdr00uk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_PafQ-__hE2weCmIHsuWfTH04zBLscy8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "995636706916-nhf24teeigsg1s73dbht53cptqdr00uk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

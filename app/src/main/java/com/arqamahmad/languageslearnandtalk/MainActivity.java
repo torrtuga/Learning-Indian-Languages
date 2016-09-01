@@ -1,14 +1,25 @@
 package com.arqamahmad.languageslearnandtalk;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
-import android.widget.ListView;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -18,40 +29,103 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements GoogleApiClient.OnConnectionFailedListener{
 
     public static String familyResponse = "";
     public static String numbersResponse = "";
     public static String pronounsResponse = "";
     public static String phrasesResponse = "";
 
+    private Button mChatButton;
+    private Button mLearnButton;
+    private TextView mTextViewHeading;
+    private SharedPreferences mSharedPreferences;
+    private GoogleApiClient mGoogleApiClient;
+    private String mPhotoUrl;
+
+    public static final String ANONYMOUS = "anonymous";
+    private String mUsername;
+    private static final String TAG = "MainActivity";
+
+    // Firebase instance variables
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fetchDataFromWeb();
+        fetchDataFromWeb(); //Call to download data
 
-        String[] languages = {"Kannada","Tamil","Telugu","Malayalam","Bengali"}; //String array with language name
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        // default username is anonymous.
+        mUsername = ANONYMOUS;
+        // Initialize Firebase Auth
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        if (mFirebaseUser == null) {
+            // Not signed in, launch the Sign In activity
+            startActivity(new Intent(this, SignInActivity.class));
+            finish();
+            return;
+        } else {
+            mUsername = mFirebaseUser.getDisplayName();
+            if (mFirebaseUser.getPhotoUrl() != null) {
+                mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
+            }
+        }
 
-        ListAdapter arrayAdapter = new ArrayAdapter<String>(this,R.layout.main_activity_array_adapter,
-                R.id.textView,languages);
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API)
+                .build();
 
-        ListView listView = (ListView)findViewById(R.id.listView);
-        listView.setAdapter(arrayAdapter); //populating listview with the adapter
+        mChatButton = (Button)findViewById(R.id.buttonChat);
+        mLearnButton = (Button)findViewById(R.id.buttonLearn);
+        mTextViewHeading = (TextView)findViewById(R.id.textView);
 
-        //Starting activities for the particular languages on clicking
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mChatButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                switch(position){
-                    case 0:
-                        Intent kannadaIntent = new Intent(MainActivity.this,Kannada.class);
-                        startActivity(kannadaIntent);
-                        break;
-                }
+            public void onClick(View view) {
+                //Calling chat Activity
+                Intent chatIntent = new Intent(view.getContext(),ChatActivity.class);
+                startActivity(chatIntent);
             }
         });
+        mLearnButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Calling Kannada Activity
+                Intent learnIntent = new Intent(view.getContext(),Kannada.class);
+                startActivity(learnIntent);
+            }
+        });
+
+
+    }
+
+    //Menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sign_out_menu:
+                mFirebaseAuth.signOut();
+                Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+                mUsername = ANONYMOUS;
+                startActivity(new Intent(this, SignInActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     //Getting Data From Internet
@@ -132,6 +206,13 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
+    }
 
 
 }
