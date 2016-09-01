@@ -12,7 +12,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 public class CategoryAdapter extends FragmentPagerAdapter {
 
     //Number of pages in the ViewPager
-    private final int NUM_PAGES = 5;
+    private final int NUM_PAGES = 4;
     //Context of the app
     private Context mContext;
 
@@ -28,11 +28,8 @@ public class CategoryAdapter extends FragmentPagerAdapter {
             return new FamilyFragment();
         } else if (position == 2) {
             return new PronounsFragment();
-        } else if (position == 3){
+        } else {
             return new PhrasesFragment();
-        }
-        else {
-            return new ChatFragment();
         }
     }
 
@@ -49,11 +46,8 @@ public class CategoryAdapter extends FragmentPagerAdapter {
             return mContext.getString(R.string.category_family);
         } else if (position == 2) {
             return mContext.getString(R.string.category_pronouns);
-        } else if(position == 3) {
+        } else {
             return mContext.getString(R.string.category_phrases);
-        }
-        else{
-            return mContext.getString(R.string.category_chat);
         }
     }
 }
