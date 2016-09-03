@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -23,22 +22,18 @@ public class NumbersFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_layout, container, false);
-
-        ArrayList<CustomDataStructure> words = new ArrayList<CustomDataStructure>();
-
-
+        View rootView;
         if (MainActivity.numbersResponse == "") {
-            ListView listview =(ListView) rootView.findViewById(R.id.list);
-            listview.setDivider(null);
-            listview.setDividerHeight(0);
+            rootView = inflater.inflate(R.layout.fragment_no_internet,container,false);
 
         } else {
+            rootView = inflater.inflate(R.layout.fragment_layout,container,false);
+            ArrayList<CustomDataStructure> words = new ArrayList<CustomDataStructure>();
             //parsing the response into CustomDataStructure
             String response = MainActivity.numbersResponse;
             String[] dataArray = response.split("\\*");
-            int i = 0;
-            for (i = 0; i < dataArray.length; i++) {
+            int i;
+            for  (i =0; i<dataArray.length; i++){
                 String[] songArray = dataArray[i].split(",");
                 CustomDataStructure temp = new CustomDataStructure(songArray[2], songArray[1]); //To make the language word at top
                 words.add(temp);
@@ -56,9 +51,9 @@ public class NumbersFragment extends Fragment {
                         new Player();
                     }
                     CustomDataStructure temp = (CustomDataStructure)listView.getItemAtPosition(position);
-                    String str = temp.getmDefaultTranslationId();
-                    String url = "http://arqamahmad.com/music_app/bensound-cute.mp3";
-                    Toast.makeText(getActivity(), str, Toast.LENGTH_SHORT).show();
+                    String str = Integer.toString(position);
+                    String url = "http://arqamahmad.com/language_app/KannadaNumbers/"+str+".mp3";
+                    //Toast.makeText(getActivity(), str, Toast.LENGTH_SHORT).show();
                     Player.player.playStream(url);
                 }
             });

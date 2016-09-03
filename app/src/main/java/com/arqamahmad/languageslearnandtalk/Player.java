@@ -39,7 +39,7 @@ public class Player {
             });
             mediaPlayer.prepareAsync();//Doing in the background thread
         } catch (IOException e) {
-            e.printStackTrace();
+
         }
         mediaPlayer.start();
     }

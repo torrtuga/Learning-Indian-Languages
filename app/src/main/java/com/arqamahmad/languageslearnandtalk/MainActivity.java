@@ -1,12 +1,12 @@
 package com.arqamahmad.languageslearnandtalk;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,9 +31,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity
-        implements GoogleApiClient.OnConnectionFailedListener{
+        implements GoogleApiClient.OnConnectionFailedListener,
+        FragmentManager.OnBackStackChangedListener{
 
     public static String familyResponse = "";
     public static String numbersResponse = "";
@@ -56,6 +59,10 @@ public class MainActivity extends AppCompatActivity
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private FirebaseAnalytics mFirebaseAnalytics;
+
+    // Whether or not we're showing the back of the card (otherwise showing the front)
+    private boolean mShowingBack = false;
+    private Timer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +98,29 @@ public class MainActivity extends AppCompatActivity
 
         mChatButton = (Button)findViewById(R.id.buttonChat);
         mLearnButton = (Button)findViewById(R.id.buttonLearn);
-        mTextViewHeading = (TextView)findViewById(R.id.textView);
+        //mTextViewHeading = (TextView)findViewById(R.id.textView);
+
+        //CardFlip Fragment
+        if (savedInstanceState == null) {
+            // If there is no saved instance state, add a fragment representing the
+            // front of the card to this activity. If there is saved instance state,
+            // this fragment will have already been added to the activity.
+            getFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.container, new CardFrontFragment())
+                    .commit();
+        } else {
+            mShowingBack = (getFragmentManager().getBackStackEntryCount() > 0);
+        }
+        // Monitor back stack changes to ensure the action bar shows the appropriate
+        // button (either "photo" or "info").
+        getFragmentManager().addOnBackStackChangedListener(this);
+
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {flipCard();}
+        }, 0, 1500);//here time 1000 milliseconds=1 second
 
         mChatButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,7 +178,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
+        //Log.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
 
         if (requestCode == REQUEST_INVITE) {
             if (resultCode == RESULT_OK) {
@@ -160,7 +189,7 @@ public class MainActivity extends AppCompatActivity
                 // Check how many invitations were sent and log.
                 String[] ids = AppInviteInvitation.getInvitationIds(resultCode,
                         data);
-                Log.d(TAG, "Invitations sent: " + ids.length);
+                //Log.d(TAG, "Invitations sent: " + ids.length);
             } else {
                 Bundle payload = new Bundle();
                 payload.putString(FirebaseAnalytics.Param.VALUE, "not sent");
@@ -168,7 +197,7 @@ public class MainActivity extends AppCompatActivity
                         payload);
                 // Sending failed or it was canceled, show failure message to
                 // the user
-                Log.d(TAG, "Failed to send invitation.");
+                //Log.d(TAG, "Failed to send invitation.");
             }
         }
     }
@@ -194,7 +223,7 @@ public class MainActivity extends AppCompatActivity
                     if(statusCode == 200){
                         inputStream = new BufferedInputStream(urlConnection.getInputStream());
                         familyResponse = convertInputStreamToString(inputStream);
-                        Log.i("Got Songs", familyResponse);
+                        //Log.i("Got Songs", familyResponse);
 
                     }
                     //Numbers Data
@@ -255,9 +284,84 @@ public class MainActivity extends AppCompatActivity
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        //Log.d(TAG, "onConnectionFailed:" + connectionResult);
         Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
     }
 
 
+    //Flipping the fragment Card
+    private void flipCard() {
+        if (mShowingBack) {
+            getFragmentManager().popBackStack();
+            return;
+        }
+
+        // Flip to the back.
+
+        mShowingBack = true;
+
+        // Create and commit a new fragment transaction that adds the fragment for
+        // the back of the card, uses custom animations, and is part of the fragment
+        // manager's back stack.
+
+        getFragmentManager()
+                .beginTransaction()
+
+                // Replace the default fragment animations with animator resources
+                // representing rotations when switching to the back of the card, as
+                // well as animator resources representing rotations when flipping
+                // back to the front (e.g. when the system Back button is pressed).
+                .setCustomAnimations(
+                        R.animator.card_flip_right_in,
+                        R.animator.card_flip_right_out,
+                        R.animator.card_flip_left_in,
+                        R.animator.card_flip_left_out)
+
+                // Replace any fragments currently in the container view with a
+                // fragment representing the next page (indicated by the
+                // just-incremented currentPage variable).
+                .replace(R.id.container, new CardBackFragment())
+
+                // Add this transaction to the back stack, allowing users to press
+                // Back to get to the front of the card.
+                .addToBackStack(null)
+
+                // Commit the transaction.
+                .commit();
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        mShowingBack = (getFragmentManager().getBackStackEntryCount() > 0);
+
+        // When the back stack changes, invalidate the options menu (action bar).
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (this.numbersResponse == ""){
+            fetchDataFromWeb();
+        }
+    }
+
+
+    @Override
+    protected void onPause() {
+        timer.cancel();
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        timer.cancel();
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        //timer.cancel();
+        super.onDestroy();
+    }
 }

@@ -1,7 +1,5 @@
 package com.arqamahmad.languageslearnandtalk;
 
-import android.util.Log;
-
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -20,7 +18,7 @@ public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
         // If we need to handle the generation of a token, initially or
         // after a refresh
         String token = FirebaseInstanceId.getInstance().getToken();
-        Log.d(TAG, "FCM Token: " + token);
+        //Log.d(TAG, "FCM Token: " + token);
 
         // Once a token is generated, we subscribe to topic.
         FirebaseMessaging.getInstance()
